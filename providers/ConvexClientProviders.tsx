@@ -22,10 +22,10 @@ const ConvexClientProviders = ({ children }: Props) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-      router.push("/");
-    }, 3000);
+      router.push("/"); // Redirect to the home page
+    }, 2000); // Simulate a 2-second loading time
 
-    return () => clearTimeout(timer);
+    return () => clearTimeout(timer); // Cleanup the timer
   }, [router]);
 
   if (isLoading) {
