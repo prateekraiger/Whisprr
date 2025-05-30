@@ -1,30 +1,46 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
-import { useChat } from "../context/ChatContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { PaperAirplaneIcon, UserGroupIcon } from "@heroicons/react/24/outline";
+import { io } from "socket.io-client";
+
+const socket = io("http://localhost:3001");
 
 const ChatRoom = () => {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const { user } = useUser();
   const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [participants, setParticipants] = useState([]);
   const messagesEndRef = useRef(null);
-  const {
-    joinRoom,
-    leaveRoom,
-    sendMessage,
-    getRoomMessages,
-    getRoomParticipants,
-  } = useChat();
-
-  const messages = getRoomMessages(roomId);
-  const participants = getRoomParticipants(roomId);
 
   useEffect(() => {
-    joinRoom(roomId);
-    return () => leaveRoom(roomId);
+    // Join the chat room
+    socket.emit("join_chat", { chatCode: roomId, isHost: true });
+
+    // Listen for messages
+    socket.on("receive_message", (message) => {
+      setMessages((prev) => [...prev, message]);
+    });
+
+    // Listen for existing messages
+    socket.on("load_messages", (existingMessages) => {
+      setMessages(existingMessages);
+    });
+
+    // Listen for participant updates
+    socket.on("participants_update", (updatedParticipants) => {
+      setParticipants(updatedParticipants);
+    });
+
+    return () => {
+      socket.off("receive_message");
+      socket.off("load_messages");
+      socket.off("participants_update");
+      socket.emit("leave_chat", { chatCode: roomId });
+    };
   }, [roomId]);
 
   useEffect(() => {
@@ -35,25 +51,32 @@ const ChatRoom = () => {
     e.preventDefault();
     if (!message.trim() || !user) return;
 
-    sendMessage(roomId, message.trim());
+    const newMessage = {
+      id: Date.now(),
+      text: message.trim(),
+      sender: user.firstName || "Anonymous",
+      timestamp: new Date().toLocaleTimeString(),
+    };
+
+    socket.emit("send_message", { chatCode: roomId, message: newMessage });
     setMessage("");
   };
 
   return (
-    <div className="min-h-screen bg-dark-100 flex flex-col">
+    <div className="min-h-screen bg-[#282C34] flex flex-col">
       {/* Header */}
-      <div className="bg-dark-200 p-4 border-b border-dark-300">
+      <div className="bg-[#21252B] p-4 border-b border-[#3E4451]">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div>
-            <h1 className="text-xl font-semibold">Room: {roomId}</h1>
-            <p className="text-gray-400 text-sm">
+            <h1 className="text-xl font-semibold text-white">Room: {roomId}</h1>
+            <p className="text-[#ABB2BF] text-sm">
               {participants.length} participant
               {participants.length !== 1 ? "s" : ""}
             </p>
           </div>
           <button
             onClick={() => navigate("/dashboard")}
-            className="btn btn-secondary"
+            className="px-4 py-2 rounded-lg bg-[#61AFEF] hover:bg-[#61AFEF]/90 text-white"
           >
             Leave Room
           </button>
@@ -72,18 +95,21 @@ const ChatRoom = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 className={`mb-4 ${
-                  msg.userId === user?.id ? "text-right" : "text-left"
+                  msg.sender === (user?.firstName || "Anonymous")
+                    ? "text-right"
+                    : "text-left"
                 }`}
               >
                 <div
                   className={`inline-block p-3 rounded-lg max-w-[70%] ${
-                    msg.userId === user?.id
-                      ? "bg-primary-600 ml-auto"
-                      : "bg-dark-200"
+                    msg.sender === (user?.firstName || "Anonymous")
+                      ? "bg-[#61AFEF] text-white"
+                      : "bg-[#2C313A] text-[#ABB2BF]"
                   }`}
                 >
-                  <p className="text-sm text-gray-300 mb-1">{msg.userName}</p>
-                  <p className="text-gray-100">{msg.content}</p>
+                  <p className="text-sm mb-1">{msg.sender}</p>
+                  <p>{msg.text}</p>
+                  <span className="text-xs opacity-70">{msg.timestamp}</span>
                 </div>
               </motion.div>
             ))}
@@ -92,19 +118,21 @@ const ChatRoom = () => {
         </div>
 
         {/* Participants Sidebar */}
-        <div className="w-64 bg-dark-200 p-4 border-l border-dark-300">
+        <div className="w-64 bg-[#21252B] p-4 border-l border-[#3E4451]">
           <div className="flex items-center gap-2 mb-4">
-            <UserGroupIcon className="w-5 h-5" />
-            <h2 className="font-semibold">Participants</h2>
+            <UserGroupIcon className="w-5 h-5 text-[#ABB2BF]" />
+            <h2 className="font-semibold text-white">Participants</h2>
           </div>
           <div className="space-y-2">
             {participants.map((participant) => (
               <div
-                key={participant.userId}
-                className="flex items-center gap-2 p-2 rounded-lg bg-dark-300"
+                key={participant.id}
+                className="flex items-center gap-2 p-2 rounded-lg bg-[#2C313A]"
               >
                 <div className="w-2 h-2 rounded-full bg-green-500" />
-                <span className="text-sm">{participant.name}</span>
+                <span className="text-sm text-[#ABB2BF]">
+                  {participant.name}
+                </span>
               </div>
             ))}
           </div>
@@ -112,7 +140,7 @@ const ChatRoom = () => {
       </div>
 
       {/* Message Input */}
-      <div className="bg-dark-200 p-4 border-t border-dark-300">
+      <div className="bg-[#21252B] p-4 border-t border-[#3E4451]">
         <form
           onSubmit={handleSendMessage}
           className="max-w-6xl mx-auto flex gap-4"
@@ -122,11 +150,11 @@ const ChatRoom = () => {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Type your message..."
-            className="input flex-1"
+            className="flex-1 px-4 py-2 rounded-lg bg-[#282C34] border border-[#3E4451] text-white placeholder-[#ABB2BF]/50 focus:outline-none focus:ring-2 focus:ring-[#61AFEF]/20"
           />
           <button
             type="submit"
-            className="btn btn-primary flex items-center gap-2"
+            className="px-4 py-2 rounded-lg bg-[#61AFEF] hover:bg-[#61AFEF]/90 text-white flex items-center gap-2"
           >
             <PaperAirplaneIcon className="w-5 h-5" />
             Send

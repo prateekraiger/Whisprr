@@ -1,208 +1,144 @@
 import { useState } from "react";
-import { useUser } from "@clerk/clerk-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { useUserProfile } from "../context/UserContext";
+import ProfileSettings from "../components/profile/ProfileSettings";
+import { motion } from "framer-motion";
+import { Cog6ToothIcon, PlusIcon } from "@heroicons/react/24/outline";
 
 export default function Dashboard() {
-  const { user } = useUser();
-  const [selectedChat, setSelectedChat] = useState(null);
-  const [message, setMessage] = useState("");
+  const navigate = useNavigate();
+  const { profile } = useUserProfile();
+  const [chatCode, setChatCode] = useState("");
+  const [showCodeInput, setShowCodeInput] = useState(false);
+  const [showProfileSettings, setShowProfileSettings] = useState(false);
 
-  // Mock data for chats - replace with real data later
-  const chats = [
-    {
-      id: 1,
-      name: "Sarah Johnson",
-      lastMessage: "Hey! How's the project going?",
-      time: "10:30 AM",
-      unread: 2,
-    },
-    {
-      id: 2,
-      name: "Mike Wilson",
-      lastMessage: "Can we schedule a meeting?",
-      time: "9:45 AM",
-      unread: 0,
-    },
-    {
-      id: 3,
-      name: "Team Chat",
-      lastMessage: "New features deployed!",
-      time: "Yesterday",
-      unread: 5,
-    },
-  ];
+  // Generate a random 6-character alphanumeric code
+  const generateCode = () => {
+    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let code = "";
+    for (let i = 0; i < 6; i++) {
+      code += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    navigate(`/chat/${code}`);
+  };
 
-  // Mock data for messages - replace with real data later
-  const messages = [
-    {
-      id: 1,
-      sender: "Sarah Johnson",
-      content: "Hey! How's the project going?",
-      time: "10:30 AM",
-      isOwn: false,
-    },
-    {
-      id: 2,
-      sender: "You",
-      content: "Going great! Just finished the new features.",
-      time: "10:32 AM",
-      isOwn: true,
-    },
-    {
-      id: 3,
-      sender: "Sarah Johnson",
-      content: "That's awesome! Can you share the details?",
-      time: "10:33 AM",
-      isOwn: false,
-    },
-  ];
-
-  const handleSendMessage = (e) => {
-    e.preventDefault();
-    if (!message.trim()) return;
-    // Add message sending logic here
-    setMessage("");
+  // Join a chat with a code
+  const joinChat = () => {
+    if (chatCode.length === 6) {
+      navigate(`/chat/${chatCode}`);
+    }
   };
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex bg-[#282c34]">
-      {/* Sidebar */}
-      <div className="w-80 border-r border-[#3e4451] bg-[#21252b] flex flex-col">
-        {/* User Profile */}
-        <div className="p-4 border-b border-[#3e4451]">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-full bg-[#61afef]/20 flex items-center justify-center">
-              <span className="text-xl">👤</span>
-            </div>
-            <div>
-              <h3 className="font-semibold text-white">
-                {user?.fullName || "User"}
-              </h3>
-              <p className="text-sm text-[#abb2bf]">Online</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Chat List */}
-        <div className="flex-1 overflow-y-auto">
-          {chats.map((chat) => (
-            <button
-              key={chat.id}
-              onClick={() => setSelectedChat(chat)}
-              className={`w-full p-4 flex items-center space-x-3 hover:bg-[#2c313a] transition-colors ${
-                selectedChat?.id === chat.id ? "bg-[#2c313a]" : ""
-              }`}
-            >
-              <div className="w-10 h-10 rounded-full bg-[#61afef]/20 flex items-center justify-center">
-                <span className="text-xl">👤</span>
-              </div>
-              <div className="flex-1 text-left">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-semibold text-white">{chat.name}</h3>
-                  <span className="text-sm text-[#abb2bf]">{chat.time}</span>
-                </div>
-                <p className="text-sm text-[#abb2bf] truncate">
-                  {chat.lastMessage}
-                </p>
-              </div>
-              {chat.unread > 0 && (
-                <div className="w-5 h-5 rounded-full bg-[#61afef] text-white text-xs flex items-center justify-center">
-                  {chat.unread}
-                </div>
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Chat Area */}
-      <div className="flex-1 flex flex-col bg-[#282c34]">
-        {selectedChat ? (
-          <>
-            {/* Chat Header */}
-            <div className="h-16 border-b border-[#3e4451] flex items-center justify-between px-6 bg-[#21252b]">
+    <div className="min-h-screen bg-[#282C34] pt-16">
+      <div className="flex h-[calc(100vh-4rem)]">
+        {/* Sidebar */}
+        <div className="w-80 border-r border-[#3E4451] bg-[#21252B] flex flex-col">
+          {/* User Profile */}
+          <div className="p-4 border-b border-[#3E4451]">
+            <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-full bg-[#61afef]/20 flex items-center justify-center">
-                  <span className="text-xl">👤</span>
+                <div className="w-12 h-12 rounded-full bg-[#61AFEF]/20 flex items-center justify-center text-2xl">
+                  {profile.avatar}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white">
-                    {selectedChat.name}
-                  </h3>
-                  <p className="text-sm text-[#abb2bf]">Online</p>
+                  <h3 className="font-semibold text-white">{profile.displayName}</h3>
+                  <p className="text-sm text-[#ABB2BF]">{profile.status}</p>
                 </div>
               </div>
-              <div className="flex space-x-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-[#abb2bf] hover:text-white hover:bg-[#2c313a]"
-                >
-                  📞
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-[#abb2bf] hover:text-white hover:bg-[#2c313a]"
-                >
-                  📹
-                </Button>
-              </div>
+              <button
+                onClick={() => setShowProfileSettings(true)}
+                className="p-2 rounded-lg hover:bg-[#2C313A] text-[#ABB2BF] hover:text-white"
+              >
+                <Cog6ToothIcon className="w-5 h-5" />
+              </button>
             </div>
-
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-4">
-              {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex ${
-                    msg.isOwn ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  <div
-                    className={`max-w-[70%] rounded-lg p-3 ${
-                      msg.isOwn
-                        ? "bg-[#61afef] text-white"
-                        : "bg-[#2c313a] text-[#abb2bf]"
-                    }`}
-                  >
-                    <p className="text-sm">{msg.content}</p>
-                    <span className="text-xs text-[#abb2bf] mt-1 block">
-                      {msg.time}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Message Input */}
-            <form
-              onSubmit={handleSendMessage}
-              className="p-4 border-t border-[#3e4451] bg-[#21252b]"
-            >
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Type a message..."
-                  className="flex-1 px-4 py-2 rounded-lg bg-[#282c34] border border-[#3e4451] text-white placeholder-[#abb2bf] focus:outline-none focus:ring-2 focus:ring-[#61afef]/20"
-                />
-                <Button
-                  type="submit"
-                  className="bg-[#61afef] hover:bg-[#61afef]/90 text-white"
-                >
-                  Send
-                </Button>
-              </div>
-            </form>
-          </>
-        ) : (
-          <div className="flex-1 flex items-center justify-center text-[#abb2bf]">
-            Select a chat to start messaging
           </div>
-        )}
+
+          {/* Chat Actions */}
+          <div className="p-4 border-b border-[#3E4451]">
+            <Button
+              onClick={generateCode}
+              className="w-full bg-[#61AFEF] hover:bg-[#61AFEF]/90 text-white mb-2 flex items-center justify-center gap-2"
+            >
+              <PlusIcon className="w-5 h-5" />
+              Create New Chat
+            </Button>
+            <Button
+              onClick={() => setShowCodeInput(!showCodeInput)}
+              variant="outline"
+              className="w-full border-[#3E4451] text-[#ABB2BF] hover:text-white hover:bg-[#2C313A]"
+            >
+              Join Chat
+            </Button>
+          </div>
+
+          {/* Join Chat Input */}
+          {showCodeInput && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="p-4 border-b border-[#3E4451]"
+            >
+              <Input
+                type="text"
+                placeholder="Enter 6-character code"
+                value={chatCode}
+                onChange={(e) => setChatCode(e.target.value.toUpperCase())}
+                className="bg-[#282C34] border-[#3E4451] text-white placeholder-[#ABB2BF]/50 mb-2"
+                maxLength={6}
+              />
+              <Button
+                onClick={joinChat}
+                className="w-full bg-[#61AFEF] hover:bg-[#61AFEF]/90 text-white"
+              >
+                Join
+              </Button>
+            </motion.div>
+          )}
+        </div>
+
+        {/* Main Content Area */}
+        <div className="flex-1">
+          <div className="h-full flex items-center justify-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center max-w-md mx-auto p-8"
+            >
+              <h2 className="text-3xl font-bold text-white mb-4">
+                Welcome to Whisprr
+              </h2>
+              <p className="text-[#ABB2BF] mb-8 text-lg">
+                Create a new chat or join an existing one to start messaging
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Button
+                  onClick={generateCode}
+                  className="bg-[#61AFEF] hover:bg-[#61AFEF]/90 text-white h-12 text-lg"
+                >
+                  Create Chat
+                </Button>
+                <Button
+                  onClick={() => setShowCodeInput(true)}
+                  variant="outline"
+                  className="border-[#3E4451] text-[#ABB2BF] hover:text-white hover:bg-[#2C313A] h-12 text-lg"
+                >
+                  Join Chat
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        </div>
       </div>
+
+      {/* Profile Settings Modal */}
+      {showProfileSettings && (
+        <ProfileSettings onClose={() => setShowProfileSettings(false)} />
+      )}
     </div>
   );
 }

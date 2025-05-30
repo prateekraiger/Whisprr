@@ -17,6 +17,8 @@ import Features from "./pages/Features";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Dashboard from "./pages/Dashboard";
+import ChatRoom from "./pages/ChatRoom";
+import { UserProvider } from "./context/UserContext";
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -27,33 +29,48 @@ if (!PUBLISHABLE_KEY) {
 export default function App() {
   return (
     <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-      <Router>
-        <div className="min-h-screen flex flex-col bg-[#282C34] text-[#ABB2BF]">
-          <Navbar />
-          <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/features" element={<Features />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route
-                path="/dashboard"
-                element={
-                  <>
-                    <SignedIn>
-                      <Dashboard />
-                    </SignedIn>
-                    <SignedOut>
-                      <RedirectToSignIn />
-                    </SignedOut>
-                  </>
-                }
-              />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
-      </Router>
+      <UserProvider>
+        <Router>
+          <div className="min-h-screen flex flex-col bg-[#282C34] text-[#ABB2BF]">
+            <Navbar />
+            <main className="flex-grow">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/features" element={<Features />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <>
+                      <SignedIn>
+                        <Dashboard />
+                      </SignedIn>
+                      <SignedOut>
+                        <RedirectToSignIn />
+                      </SignedOut>
+                    </>
+                  }
+                />
+                <Route
+                  path="/chat/:roomId"
+                  element={
+                    <>
+                      <SignedIn>
+                        <ChatRoom />
+                      </SignedIn>
+                      <SignedOut>
+                        <RedirectToSignIn />
+                      </SignedOut>
+                    </>
+                  }
+                />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
+        </Router>
+      </UserProvider>
     </ClerkProvider>
   );
 }
