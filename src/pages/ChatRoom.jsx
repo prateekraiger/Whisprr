@@ -1,8 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
+import { useUserProfile } from "../context/UserContext";
 import { motion, AnimatePresence } from "framer-motion";
-import { PaperAirplaneIcon, UserGroupIcon } from "@heroicons/react/24/outline";
+import {
+  PaperAirplaneIcon,
+  UserGroupIcon,
+  ArrowLeftIcon,
+} from "@heroicons/react/24/outline";
 import { io } from "socket.io-client";
 
 const socket = io("http://localhost:3001");
@@ -11,6 +16,7 @@ const ChatRoom = () => {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const { user } = useUser();
+  const { profile } = useUserProfile();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [participants, setParticipants] = useState([]);
@@ -54,7 +60,8 @@ const ChatRoom = () => {
     const newMessage = {
       id: Date.now(),
       text: message.trim(),
-      sender: user.firstName || "Anonymous",
+      sender: profile.displayName,
+      avatar: profile.avatar,
       timestamp: new Date().toLocaleTimeString(),
     };
 
@@ -67,19 +74,23 @@ const ChatRoom = () => {
       {/* Header */}
       <div className="bg-[#21252B] p-4 border-b border-[#3E4451]">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <div>
-            <h1 className="text-xl font-semibold text-white">Room: {roomId}</h1>
-            <p className="text-[#ABB2BF] text-sm">
-              {participants.length} participant
-              {participants.length !== 1 ? "s" : ""}
-            </p>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="p-2 rounded-lg hover:bg-[#2C313A] text-[#ABB2BF] hover:text-white"
+            >
+              <ArrowLeftIcon className="w-5 h-5" />
+            </button>
+            <div>
+              <h1 className="text-xl font-semibold text-white">
+                Room: {roomId}
+              </h1>
+              <p className="text-[#ABB2BF] text-sm">
+                {participants.length} participant
+                {participants.length !== 1 ? "s" : ""}
+              </p>
+            </div>
           </div>
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="px-4 py-2 rounded-lg bg-[#61AFEF] hover:bg-[#61AFEF]/90 text-white"
-          >
-            Leave Room
-          </button>
         </div>
       </div>
 
@@ -95,21 +106,33 @@ const ChatRoom = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 className={`mb-4 ${
-                  msg.sender === (user?.firstName || "Anonymous")
+                  msg.sender === profile.displayName
                     ? "text-right"
                     : "text-left"
                 }`}
               >
-                <div
-                  className={`inline-block p-3 rounded-lg max-w-[70%] ${
-                    msg.sender === (user?.firstName || "Anonymous")
-                      ? "bg-[#61AFEF] text-white"
-                      : "bg-[#2C313A] text-[#ABB2BF]"
-                  }`}
-                >
-                  <p className="text-sm mb-1">{msg.sender}</p>
-                  <p>{msg.text}</p>
-                  <span className="text-xs opacity-70">{msg.timestamp}</span>
+                <div className="flex items-end gap-2 max-w-[70%] mx-auto">
+                  {msg.sender !== profile.displayName && (
+                    <div className="w-8 h-8 rounded-full bg-[#61AFEF]/20 flex items-center justify-center text-lg">
+                      {msg.avatar}
+                    </div>
+                  )}
+                  <div
+                    className={`p-3 rounded-lg ${
+                      msg.sender === profile.displayName
+                        ? "bg-[#61AFEF] text-white rounded-tr-none"
+                        : "bg-[#2C313A] text-[#ABB2BF] rounded-tl-none"
+                    }`}
+                  >
+                    <p className="text-sm mb-1">{msg.sender}</p>
+                    <p>{msg.text}</p>
+                    <span className="text-xs opacity-70">{msg.timestamp}</span>
+                  </div>
+                  {msg.sender === profile.displayName && (
+                    <div className="w-8 h-8 rounded-full bg-[#61AFEF]/20 flex items-center justify-center text-lg">
+                      {msg.avatar}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             ))}
