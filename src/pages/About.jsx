@@ -3,30 +3,30 @@ import { Button } from "../components/ui/button";
 import { Link } from "react-router-dom";
 
 export default function About() {
-  const team = [
+  const values = [
     {
-      name: "Sarah Johnson",
-      role: "CEO & Founder",
-      image: "👩‍💼",
-      bio: "Passionate about creating secure and user-friendly communication tools.",
+      title: "Privacy First",
+      description:
+        "We believe in protecting user privacy and data security above all else.",
+      icon: "🔒",
     },
     {
-      name: "Michael Chen",
-      role: "CTO",
-      image: "👨‍💻",
-      bio: "Expert in encryption and real-time communication systems.",
+      title: "User-Centric",
+      description:
+        "Every feature and decision is made with our users' needs in mind.",
+      icon: "👥",
     },
     {
-      name: "Emma Rodriguez",
-      role: "Head of Design",
-      image: "👩‍🎨",
-      bio: "Focused on creating beautiful and intuitive user experiences.",
+      title: "Innovation",
+      description:
+        "We constantly push boundaries to deliver cutting-edge solutions.",
+      icon: "💡",
     },
     {
-      name: "David Kim",
-      role: "Lead Developer",
-      image: "👨‍💻",
-      bio: "Specializes in building scalable and secure applications.",
+      title: "Transparency",
+      description:
+        "We maintain open communication and clear policies with our users.",
+      icon: "✨",
     },
   ];
 
@@ -47,8 +47,8 @@ export default function About() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Mission */}
+        {/* Mission and Vision */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -58,40 +58,65 @@ export default function About() {
             <h2 className="text-2xl font-semibold mb-4 text-white">
               Our Mission
             </h2>
-            <p className="text-[#ABB2BF]">
+            <p className="text-[#ABB2BF] mb-4">
               At Whisprr, we believe in providing a secure and seamless
               messaging experience for everyone. Our mission is to make
               communication more accessible, private, and enjoyable.
             </p>
+            <p className="text-[#ABB2BF]">
+              We're committed to building a platform that prioritizes user
+              privacy while delivering a feature-rich experience that keeps
+              people connected.
+            </p>
           </motion.div>
 
-          {/* Team */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
             className="bg-[#21252B] rounded-xl p-8 border border-[#3E4451]"
           >
-            <h2 className="text-2xl font-semibold mb-4 text-white">Our Team</h2>
+            <h2 className="text-2xl font-semibold mb-4 text-white">
+              Our Vision
+            </h2>
+            <p className="text-[#ABB2BF] mb-4">
+              We envision a world where secure communication is accessible to
+              everyone, where privacy is a fundamental right, not a premium
+              feature.
+            </p>
             <p className="text-[#ABB2BF]">
-              Our team is composed of passionate individuals dedicated to
-              creating the best messaging platform. We are committed to
-              innovation and user satisfaction.
+              Our goal is to become the most trusted messaging platform, known
+              for its commitment to security, user experience, and innovation.
             </p>
           </motion.div>
         </div>
 
-        <div className="text-center mt-12">
-          <Link to="/contact">
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-[#3E4451] text-[#ABB2BF] hover:bg-[#2C313A] hover:text-white"
-            >
-              Contact Us
-            </Button>
-          </Link>
-        </div>
+        {/* Values */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-[#21252B] rounded-xl p-8 border border-[#3E4451]"
+        >
+          <h2 className="text-2xl font-semibold mb-8 text-white">Our Values</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {values.map((value, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-[#282C34] rounded-xl p-6 border border-[#3E4451] hover:border-[#61AFEF]/50 transition-colors"
+              >
+                <div className="text-4xl mb-4">{value.icon}</div>
+                <h3 className="text-xl font-semibold mb-2 text-[#61AFEF]">
+                  {value.title}
+                </h3>
+                <p className="text-[#ABB2BF]">{value.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
       </section>
     </div>
   );

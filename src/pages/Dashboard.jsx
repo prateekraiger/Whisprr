@@ -5,7 +5,7 @@ import { Input } from "../components/ui/input";
 import { useUserProfile } from "../context/UserContext";
 import ProfileSettings from "../components/profile/ProfileSettings";
 import { motion } from "framer-motion";
-import { Cog6ToothIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { Cog6ToothIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -13,6 +13,8 @@ export default function Dashboard() {
   const [chatCode, setChatCode] = useState("");
   const [showCodeInput, setShowCodeInput] = useState(false);
   const [showProfileSettings, setShowProfileSettings] = useState(false);
+  const [showCodePopup, setShowCodePopup] = useState(false);
+  const [generatedCode, setGeneratedCode] = useState("");
 
   // Generate a random 6-character alphanumeric code
   const generateCode = () => {
@@ -21,7 +23,8 @@ export default function Dashboard() {
     for (let i = 0; i < 6; i++) {
       code += characters.charAt(Math.floor(Math.random() * characters.length));
     }
-    navigate(`/chat/${code}`);
+    setGeneratedCode(code);
+    setShowCodePopup(true);
   };
 
   // Join a chat with a code
@@ -29,6 +32,11 @@ export default function Dashboard() {
     if (chatCode.length === 6) {
       navigate(`/chat/${chatCode}`);
     }
+  };
+
+  const handleStartChat = () => {
+    setShowCodePopup(false);
+    navigate(`/chat/${generatedCode}`);
   };
 
   return (
@@ -44,7 +52,9 @@ export default function Dashboard() {
                   {profile.avatar}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white">{profile.displayName}</h3>
+                  <h3 className="font-semibold text-white">
+                    {profile.displayName}
+                  </h3>
                   <p className="text-sm text-[#ABB2BF]">{profile.status}</p>
                 </div>
               </div>
@@ -56,49 +66,6 @@ export default function Dashboard() {
               </button>
             </div>
           </div>
-
-          {/* Chat Actions */}
-          <div className="p-4 border-b border-[#3E4451]">
-            <Button
-              onClick={generateCode}
-              className="w-full bg-[#61AFEF] hover:bg-[#61AFEF]/90 text-white mb-2 flex items-center justify-center gap-2"
-            >
-              <PlusIcon className="w-5 h-5" />
-              Create New Chat
-            </Button>
-            <Button
-              onClick={() => setShowCodeInput(!showCodeInput)}
-              variant="outline"
-              className="w-full border-[#3E4451] text-[#ABB2BF] hover:text-white hover:bg-[#2C313A]"
-            >
-              Join Chat
-            </Button>
-          </div>
-
-          {/* Join Chat Input */}
-          {showCodeInput && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="p-4 border-b border-[#3E4451]"
-            >
-              <Input
-                type="text"
-                placeholder="Enter 6-character code"
-                value={chatCode}
-                onChange={(e) => setChatCode(e.target.value.toUpperCase())}
-                className="bg-[#282C34] border-[#3E4451] text-white placeholder-[#ABB2BF]/50 mb-2"
-                maxLength={6}
-              />
-              <Button
-                onClick={joinChat}
-                className="w-full bg-[#61AFEF] hover:bg-[#61AFEF]/90 text-white"
-              >
-                Join
-              </Button>
-            </motion.div>
-          )}
         </div>
 
         {/* Main Content Area */}
@@ -130,6 +97,31 @@ export default function Dashboard() {
                   Join Chat
                 </Button>
               </div>
+
+              {/* Join Chat Input */}
+              {showCodeInput && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mt-6"
+                >
+                  <Input
+                    type="text"
+                    placeholder="Enter 6-character code"
+                    value={chatCode}
+                    onChange={(e) => setChatCode(e.target.value.toUpperCase())}
+                    className="bg-[#282C34] border-[#3E4451] text-white placeholder-[#ABB2BF]/50 mb-2"
+                    maxLength={6}
+                  />
+                  <Button
+                    onClick={joinChat}
+                    className="w-full bg-[#61AFEF] hover:bg-[#61AFEF]/90 text-white"
+                  >
+                    Join
+                  </Button>
+                </motion.div>
+              )}
             </motion.div>
           </div>
         </div>
@@ -138,6 +130,42 @@ export default function Dashboard() {
       {/* Profile Settings Modal */}
       {showProfileSettings && (
         <ProfileSettings onClose={() => setShowProfileSettings(false)} />
+      )}
+
+      {/* Chat Code Popup */}
+      {showCodePopup && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-[#21252B] rounded-lg p-6 max-w-md w-full mx-4 relative"
+          >
+            <button
+              onClick={() => setShowCodePopup(false)}
+              className="absolute top-4 right-4 text-[#ABB2BF] hover:text-white"
+            >
+              <XMarkIcon className="w-6 h-6" />
+            </button>
+            <h3 className="text-xl font-semibold text-white mb-4">
+              Chat Code Generated
+            </h3>
+            <div className="bg-[#282C34] rounded-lg p-4 mb-6">
+              <p className="text-2xl font-mono text-[#61AFEF] tracking-wider">
+                {generatedCode}
+              </p>
+            </div>
+            <p className="text-[#ABB2BF] mb-6">
+              Share this code with others to join your chat room. The code will
+              be valid for this session.
+            </p>
+            <Button
+              onClick={handleStartChat}
+              className="w-full bg-[#61AFEF] hover:bg-[#61AFEF]/90 text-white h-12 text-lg"
+            >
+              Start Chat
+            </Button>
+          </motion.div>
+        </div>
       )}
     </div>
   );

@@ -75,18 +75,6 @@ export default function Features() {
             </motion.div>
           ))}
         </div>
-
-        <div className="text-center mt-12">
-          <Link to="/contact">
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-[#3E4451] text-[#ABB2BF] hover:bg-[#2C313A] hover:text-white"
-            >
-              Contact Us
-            </Button>
-          </Link>
-        </div>
       </section>
     </div>
   );

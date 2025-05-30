@@ -27,12 +27,14 @@ export default function Home() {
               support.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button
-                size="lg"
-                className="bg-[#61AFEF] hover:bg-[#61AFEF]/90 text-white"
-              >
-                Get Started
-              </Button>
+              <Link to="/dashboard">
+                <Button
+                  size="lg"
+                  className="bg-[#61AFEF] hover:bg-[#61AFEF]/90 text-white"
+                >
+                  Get Started
+                </Button>
+              </Link>
               <Link to="/features">
                 <Button
                   size="lg"
@@ -180,18 +182,6 @@ export default function Home() {
               <p className="text-[#ABB2BF]">{feature.description}</p>
             </motion.div>
           ))}
-        </div>
-
-        <div className="text-center mt-12">
-          <Link to="/features">
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-[#3E4451] text-[#ABB2BF] hover:bg-[#2C313A] hover:text-white"
-            >
-              View All Features
-            </Button>
-          </Link>
         </div>
       </section>
     </div>

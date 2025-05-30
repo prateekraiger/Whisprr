@@ -23,6 +23,12 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             <Link
+              to="/"
+              className="text-[#ABB2BF] hover:text-white transition-colors"
+            >
+              Home
+            </Link>
+            <Link
               to="/features"
               className="text-[#ABB2BF] hover:text-white transition-colors"
             >
@@ -68,13 +74,13 @@ export default function Navbar() {
                 <SignInButton mode="modal">
                   <Button
                     variant="ghost"
-                    className="text-[#ABB2BF] hover:text-white hover:bg-[#2C313A]"
+                    className="text-[#ABB2BF] hover:text-white hover:bg-[#2C313A] px-6"
                   >
                     Sign In
                   </Button>
                 </SignInButton>
                 <SignUpButton mode="modal">
-                  <Button className="bg-[#61AFEF] hover:bg-[#61AFEF]/90 text-white">
+                  <Button className="bg-gradient-to-r from-[#61AFEF] to-[#C678DD] hover:from-[#61AFEF]/90 hover:to-[#C678DD]/90 text-white px-6 shadow-lg shadow-[#61AFEF]/20">
                     Sign Up
                   </Button>
                 </SignUpButton>
@@ -124,6 +130,13 @@ export default function Navbar() {
           <div className="md:hidden bg-[#21252B] border-t border-[#3E4451]">
             <div className="px-4 py-4 space-y-4">
               <Link
+                to="/"
+                className="block text-[#ABB2BF] hover:text-white transition-colors py-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Home
+              </Link>
+              <Link
                 to="/features"
                 className="block text-[#ABB2BF] hover:text-white transition-colors py-2"
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -166,11 +179,11 @@ export default function Navbar() {
                   </div>
                 </>
               ) : (
-                <div className="flex flex-col space-y-2 pt-2">
+                <div className="flex flex-col space-y-3 pt-2">
                   <SignInButton mode="modal">
                     <Button
                       variant="ghost"
-                      className="w-full text-[#ABB2BF] hover:text-white hover:bg-[#2C313A]"
+                      className="w-full text-[#ABB2BF] hover:text-white hover:bg-[#2C313A] py-3"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       Sign In
@@ -178,7 +191,7 @@ export default function Navbar() {
                   </SignInButton>
                   <SignUpButton mode="modal">
                     <Button
-                      className="w-full bg-[#61AFEF] hover:bg-[#61AFEF]/90 text-white"
+                      className="w-full bg-gradient-to-r from-[#61AFEF] to-[#C678DD] hover:from-[#61AFEF]/90 hover:to-[#C678DD]/90 text-white py-3 shadow-lg shadow-[#61AFEF]/20"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       Sign Up
