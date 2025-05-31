@@ -1,6 +1,6 @@
 # Whisprr - Secure End-to-End Encrypted Messaging Platform
 
-![Whisprr Banner](public/banner.png)
+![Whisprr Banner](https://res.cloudinary.com/dk3pg4zly/image/upload/v1748681509/Screenshot_2025-05-31_142009-min_szvtfc.png)
 
 Whisprr is a modern, secure messaging platform that prioritizes user privacy and security through end-to-end encryption. Built with React and powered by Clerk for authentication, Whisprr provides a seamless and secure communication experience.
 
