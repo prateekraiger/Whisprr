@@ -31,9 +31,9 @@ export default function App() {
     <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
       <UserProvider>
         <Router>
-          <div className="min-h-screen flex flex-col bg-[#282C34] text-[#ABB2BF]">
+          <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#1E1E1E] to-[#252526] text-[#ABB2BF]">
             <Navbar />
-            <main className="flex-grow">
+            <main className="flex-grow pt-16">
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/features" element={<Features />} />

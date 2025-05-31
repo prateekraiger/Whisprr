@@ -1,172 +1,218 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
+import { useUser } from "@clerk/clerk-react";
 import { useUserProfile } from "../context/UserContext";
-import ProfileSettings from "../components/profile/ProfileSettings";
-import { motion } from "framer-motion";
-import { Cog6ToothIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  PlusIcon,
+  ArrowRightIcon,
+  UserCircleIcon,
+  ShieldCheckIcon,
+  ClockIcon,
+  UserGroupIcon,
+  CheckIcon,
+  DocumentDuplicateIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
+import { Input } from "../components/ui/input";
+import GridBackground from "../components/ui/grid-background";
+import SkewHoverButton from "../components/ui/skew-hover-button";
 
-export default function Dashboard() {
+const Dashboard = () => {
   const navigate = useNavigate();
+  const { user } = useUser();
   const { profile } = useUserProfile();
   const [chatCode, setChatCode] = useState("");
-  const [showCodeInput, setShowCodeInput] = useState(false);
-  const [showProfileSettings, setShowProfileSettings] = useState(false);
+  const [showCopied, setShowCopied] = useState(false);
+  const [joinCode, setJoinCode] = useState("");
   const [showCodePopup, setShowCodePopup] = useState(false);
-  const [generatedCode, setGeneratedCode] = useState("");
 
-  // Generate a random 6-character alphanumeric code
-  const generateCode = () => {
-    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let code = "";
-    for (let i = 0; i < 6; i++) {
-      code += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    setGeneratedCode(code);
+  const handleCreateChat = () => {
+    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+    setChatCode(code);
     setShowCodePopup(true);
   };
 
-  // Join a chat with a code
-  const joinChat = () => {
-    if (chatCode.length === 6) {
-      navigate(`/chat/${chatCode}`);
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText(chatCode);
+    setShowCopied(true);
+    setTimeout(() => setShowCopied(false), 2000);
+  };
+
+  const handleJoinChat = (e) => {
+    e.preventDefault();
+    if (joinCode.trim()) {
+      navigate(`/chat/${joinCode.trim()}`);
     }
   };
 
-  const handleStartChat = () => {
+  const handleEnterChat = () => {
     setShowCodePopup(false);
-    navigate(`/chat/${generatedCode}`);
+    navigate(`/chat/${chatCode}`);
   };
 
   return (
-    <div className="min-h-screen bg-[#282C34] pt-16">
-      <div className="flex h-[calc(100vh-4rem)]">
-        {/* Sidebar */}
-        <div className="w-80 border-r border-[#3E4451] bg-[#21252B] flex flex-col">
-          {/* User Profile */}
-          <div className="p-4 border-b border-[#3E4451]">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 rounded-full bg-[#61AFEF]/20 flex items-center justify-center text-2xl">
-                  {profile.avatar}
-                </div>
-                <div>
-                  <h3 className="font-semibold text-white">
-                    {profile.displayName}
-                  </h3>
-                  <p className="text-sm text-[#ABB2BF]">{profile.status}</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowProfileSettings(true)}
-                className="p-2 rounded-lg hover:bg-[#2C313A] text-[#ABB2BF] hover:text-white"
+    <GridBackground>
+      <div className="min-h-screen pt-20 pb-8">
+        {/* Code Popup */}
+        <AnimatePresence>
+          {showCodePopup && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="bg-[#21252B] rounded-xl border border-[#3E4451] p-6 max-w-md w-full shadow-xl"
               >
-                <Cog6ToothIcon className="w-5 h-5" />
-              </button>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-semibold text-white">
+                    Chat Room Created!
+                  </h3>
+                  <button
+                    onClick={() => setShowCodePopup(false)}
+                    className="p-2 rounded-lg hover:bg-[#3E4451] text-[#ABB2BF] hover:text-white transition-all duration-200"
+                  >
+                    <XMarkIcon className="w-5 h-5" />
+                  </button>
+                </div>
+                <p className="text-[#ABB2BF] mb-4">
+                  Share this code with others to let them join your chat room:
+                </p>
+                <div className="p-4 rounded-lg bg-[#2C313A] border border-[#3E4451] mb-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#61AFEF] font-mono text-lg">
+                      {chatCode}
+                    </span>
+                    <button
+                      onClick={handleCopyCode}
+                      className="p-2 rounded-lg hover:bg-[#3E4451] text-[#ABB2BF] hover:text-white transition-all duration-200"
+                    >
+                      {showCopied ? (
+                        <CheckIcon className="w-5 h-5" />
+                      ) : (
+                        <DocumentDuplicateIcon className="w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowCodePopup(false)}
+                    className="flex-1 py-3 px-4 rounded-lg bg-[#2C313A] border border-[#3E4451] text-[#ABB2BF] hover:bg-[#3E4451] hover:text-white transition-all duration-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleEnterChat}
+                    className="flex-1 py-3 px-4 rounded-lg bg-gradient-to-r from-[#61AFEF] to-[#4D8BCF] text-white font-medium hover:from-[#4D8BCF] hover:to-[#61AFEF] transition-all duration-200 flex items-center justify-center gap-2"
+                  >
+                    Enter Chat Room
+                    <ArrowRightIcon className="w-5 h-5" />
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* User Profile Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-4xl mx-auto mb-8"
+        >
+          <div className="flex items-center gap-4 p-6 rounded-xl bg-[#21252B]/80 backdrop-blur-sm border border-[#3E4451] shadow-lg">
+            <div className="w-16 h-16 rounded-full overflow-hidden">
+              <img
+                src={user.imageUrl}
+                alt={profile.displayName}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-white">
+                Welcome, {profile.displayName}
+              </h1>
+              <p className="text-[#ABB2BF] mt-1">
+                {profile.status || "Ready to chat"}
+              </p>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Main Content Area */}
-        <div className="flex-1">
-          <div className="h-full flex items-center justify-center">
+        {/* Main Content */}
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Create Chat Card */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center max-w-md mx-auto p-8"
+              transition={{ delay: 0.1 }}
+              className="bg-[#21252B]/80 backdrop-blur-sm rounded-2xl border border-[#3E4451] p-6 shadow-lg"
             >
-              <h2 className="text-3xl font-bold text-white mb-4">
-                Welcome to Whisprr
-              </h2>
-              <p className="text-[#ABB2BF] mb-8 text-lg">
-                Create a new chat or join an existing one to start messaging
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Button
-                  onClick={generateCode}
-                  className="bg-[#61AFEF] hover:bg-[#61AFEF]/90 text-white h-12 text-lg"
-                >
-                  Create Chat
-                </Button>
-                <Button
-                  onClick={() => setShowCodeInput(true)}
-                  variant="outline"
-                  className="border-[#3E4451] text-[#ABB2BF] hover:text-white hover:bg-[#2C313A] h-12 text-lg"
-                >
-                  Join Chat
-                </Button>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 rounded-lg bg-[#61AFEF]/10">
+                  <PlusIcon className="w-5 h-5 text-[#61AFEF]" />
+                </div>
+                <h2 className="text-lg font-semibold text-white">
+                  Create New Chat
+                </h2>
               </div>
+              <p className="text-[#ABB2BF] text-sm mb-6">
+                Start a new secure chat room and invite others to join.
+              </p>
+              <button
+                onClick={handleCreateChat}
+                className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-[#61AFEF] to-[#4D8BCF] text-white font-medium hover:from-[#4D8BCF] hover:to-[#61AFEF] transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                <PlusIcon className="w-5 h-5" />
+                Create Chat Room
+              </button>
+            </motion.div>
 
-              {/* Join Chat Input */}
-              {showCodeInput && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="mt-6"
+            {/* Join Chat Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-[#21252B]/80 backdrop-blur-sm rounded-2xl border border-[#3E4451] p-6 shadow-lg"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 rounded-lg bg-[#61AFEF]/10">
+                  <ShieldCheckIcon className="w-5 h-5 text-[#61AFEF]" />
+                </div>
+                <h2 className="text-lg font-semibold text-white">Join Chat</h2>
+              </div>
+              <p className="text-[#ABB2BF] text-sm mb-6">
+                Enter a chat code to join an existing chat room.
+              </p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={joinCode}
+                  onChange={(e) => setJoinCode(e.target.value)}
+                  placeholder="Enter chat code"
+                  className="flex-1 py-3 px-4 rounded-lg bg-[#2C313A] border border-[#3E4451] text-white placeholder-[#ABB2BF] focus:outline-none focus:border-[#61AFEF] transition-colors duration-200"
+                />
+                <button
+                  onClick={handleJoinChat}
+                  className="py-3 px-4 rounded-lg bg-gradient-to-r from-[#61AFEF] to-[#4D8BCF] text-white font-medium hover:from-[#4D8BCF] hover:to-[#61AFEF] transition-all duration-200 flex items-center gap-2"
                 >
-                  <Input
-                    type="text"
-                    placeholder="Enter 6-character code"
-                    value={chatCode}
-                    onChange={(e) => setChatCode(e.target.value.toUpperCase())}
-                    className="bg-[#282C34] border-[#3E4451] text-white placeholder-[#ABB2BF]/50 mb-2"
-                    maxLength={6}
-                  />
-                  <Button
-                    onClick={joinChat}
-                    className="w-full bg-[#61AFEF] hover:bg-[#61AFEF]/90 text-white"
-                  >
-                    Join
-                  </Button>
-                </motion.div>
-              )}
+                  <ArrowRightIcon className="w-5 h-5" />
+                  Join
+                </button>
+              </div>
             </motion.div>
           </div>
         </div>
       </div>
-
-      {/* Profile Settings Modal */}
-      {showProfileSettings && (
-        <ProfileSettings onClose={() => setShowProfileSettings(false)} />
-      )}
-
-      {/* Chat Code Popup */}
-      {showCodePopup && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-[#21252B] rounded-lg p-6 max-w-md w-full mx-4 relative"
-          >
-            <button
-              onClick={() => setShowCodePopup(false)}
-              className="absolute top-4 right-4 text-[#ABB2BF] hover:text-white"
-            >
-              <XMarkIcon className="w-6 h-6" />
-            </button>
-            <h3 className="text-xl font-semibold text-white mb-4">
-              Chat Code Generated
-            </h3>
-            <div className="bg-[#282C34] rounded-lg p-4 mb-6">
-              <p className="text-2xl font-mono text-[#61AFEF] tracking-wider">
-                {generatedCode}
-              </p>
-            </div>
-            <p className="text-[#ABB2BF] mb-6">
-              Share this code with others to join your chat room. The code will
-              be valid for this session.
-            </p>
-            <Button
-              onClick={handleStartChat}
-              className="w-full bg-[#61AFEF] hover:bg-[#61AFEF]/90 text-white h-12 text-lg"
-            >
-              Start Chat
-            </Button>
-          </motion.div>
-        </div>
-      )}
-    </div>
+    </GridBackground>
   );
-}
+};
+
+export default Dashboard;

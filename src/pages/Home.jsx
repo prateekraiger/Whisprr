@@ -1,10 +1,17 @@
 import { motion } from "framer-motion";
-import { Button } from "../components/ui/button";
 import { Link } from "react-router-dom";
+import {
+  ShieldCheckIcon,
+  BoltIcon,
+  DevicePhoneMobileIcon,
+  ArrowRightIcon,
+} from "@heroicons/react/24/outline";
+import GridBackground from "../components/ui/grid-background";
+import SkewHoverButton from "../components/ui/skew-hover-button";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#282C34]">
+    <GridBackground>
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -14,6 +21,17 @@ export default function Home() {
             transition={{ duration: 0.5 }}
             className="space-y-8"
           >
+            <div className="inline-block">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="bg-[#61AFEF]/10 text-[#61AFEF] px-4 py-2 rounded-full text-sm font-medium mb-4 flex items-center gap-2"
+              >
+                <ShieldCheckIcon className="w-5 h-5" />
+                The Future of Secure Messaging
+              </motion.div>
+            </div>
             <h1 className="text-4xl md:text-6xl font-bold leading-tight">
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#61AFEF] via-[#C678DD] to-[#E06C75]">
                 Secure Messaging
@@ -21,110 +39,47 @@ export default function Home() {
               <br />
               <span className="text-white">for Everyone</span>
             </h1>
-            <p className="text-xl text-[#ABB2BF]">
+            <p className="text-xl text-[#ABB2BF] leading-relaxed">
               Experience the next level of secure communication with end-to-end
               encryption, real-time messaging, and seamless cross-platform
               support.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link to="/dashboard">
-                <Button
-                  size="lg"
-                  className="bg-[#61AFEF] hover:bg-[#61AFEF]/90 text-white"
-                >
+              <Link to="/dashboard" className="w-full sm:w-auto">
+                <SkewHoverButton className="h-12 text-lg">
                   Get Started
-                </Button>
+                  <ArrowRightIcon className="w-5 h-5" />
+                </SkewHoverButton>
               </Link>
-              <Link to="/features">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-[#3E4451] text-[#ABB2BF] hover:bg-[#2C313A] hover:text-white"
-                >
+              <Link to="/features" className="w-full sm:w-auto">
+                <SkewHoverButton className="h-12 text-lg bg-[#2C313A] hover:bg-[#3E4451]">
                   Learn More
-                </Button>
+                  <ArrowRightIcon className="w-5 h-5" />
+                </SkewHoverButton>
               </Link>
             </div>
           </motion.div>
 
-          {/* Chat Preview */}
+          {/* Right column - Image or Animation */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
             className="relative"
           >
-            <div className="bg-[#21252B] rounded-2xl border border-[#3E4451] p-4 shadow-xl">
-              {/* Chat Header */}
-              <div className="flex items-center justify-between mb-4 pb-4 border-b border-[#3E4451]">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-full bg-[#61AFEF]/20 flex items-center justify-center">
-                    <span className="text-xl">👤</span>
+            <div className="aspect-square rounded-2xl bg-gradient-to-br from-[#61AFEF]/20 to-[#C678DD]/20 p-8">
+              <div className="w-full h-full rounded-xl bg-[#21252B]/80 backdrop-blur-sm border border-[#3E4451] shadow-lg flex items-center justify-center">
+                <div className="text-center space-y-4">
+                  <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-[#61AFEF] to-[#4D8BCF] flex items-center justify-center shadow-lg">
+                    <ShieldCheckIcon className="w-8 h-8 text-white" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-white">Sarah Johnson</h3>
-                    <p className="text-sm text-[#ABB2BF]">Online</p>
-                  </div>
+                  <h3 className="text-xl font-semibold text-white">
+                    End-to-End Encrypted
+                  </h3>
+                  <p className="text-[#ABB2BF]">
+                    Your messages are secure and private
+                  </p>
                 </div>
-                <div className="flex space-x-2">
-                  <button className="p-2 rounded-lg hover:bg-[#2C313A] transition-colors text-[#ABB2BF] hover:text-white">
-                    📞
-                  </button>
-                  <button className="p-2 rounded-lg hover:bg-[#2C313A] transition-colors text-[#ABB2BF] hover:text-white">
-                    📹
-                  </button>
-                </div>
-              </div>
-
-              {/* Chat Messages */}
-              <div className="space-y-4 mb-4">
-                <div className="flex items-start space-x-2">
-                  <div className="w-8 h-8 rounded-full bg-[#61AFEF]/20 flex items-center justify-center">
-                    <span className="text-sm">👤</span>
-                  </div>
-                  <div className="bg-[#2C313A] rounded-lg p-3 max-w-[80%]">
-                    <p className="text-sm text-[#ABB2BF]">
-                      Hey! How's the project going?
-                    </p>
-                    <span className="text-xs text-[#ABB2BF]/70">10:30 AM</span>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-2 justify-end">
-                  <div className="bg-[#61AFEF] rounded-lg p-3 max-w-[80%]">
-                    <p className="text-sm text-white">
-                      Going great! Just finished the new features.
-                    </p>
-                    <span className="text-xs text-white/70">10:32 AM</span>
-                  </div>
-                  <div className="w-8 h-8 rounded-full bg-[#61AFEF]/20 flex items-center justify-center">
-                    <span className="text-sm">👤</span>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-2">
-                  <div className="w-8 h-8 rounded-full bg-[#61AFEF]/20 flex items-center justify-center">
-                    <span className="text-sm">👤</span>
-                  </div>
-                  <div className="bg-[#2C313A] rounded-lg p-3 max-w-[80%]">
-                    <p className="text-sm text-[#ABB2BF]">
-                      That's awesome! Can you share the details?
-                    </p>
-                    <span className="text-xs text-[#ABB2BF]/70">10:33 AM</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Chat Input */}
-              <div className="flex items-center space-x-2">
-                <input
-                  type="text"
-                  placeholder="Type a message..."
-                  className="flex-1 px-4 py-2 rounded-lg bg-[#282C34] border border-[#3E4451] text-[#ABB2BF] placeholder-[#ABB2BF]/50 focus:outline-none focus:ring-2 focus:ring-[#61AFEF]/20"
-                />
-                <button className="p-2 rounded-lg bg-[#61AFEF] hover:bg-[#61AFEF]/90 transition-colors text-white">
-                  📤
-                </button>
               </div>
             </div>
           </motion.div>
@@ -139,6 +94,16 @@ export default function Home() {
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
+          <div className="inline-block">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-[#61AFEF]/10 text-[#61AFEF] px-4 py-2 rounded-full text-sm font-medium mb-4"
+            >
+              Features
+            </motion.div>
+          </div>
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
             Why Choose Whisprr?
           </h2>
@@ -150,22 +115,24 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             {
-              icon: "🔒",
+              icon: <ShieldCheckIcon className="w-8 h-8 text-[#61AFEF]" />,
               title: "End-to-End Encryption",
               description:
-                "Your messages are encrypted from end to end, ensuring maximum security.",
+                "Your messages are encrypted from end to end, ensuring maximum security and privacy for your conversations.",
             },
             {
-              icon: "⚡",
+              icon: <BoltIcon className="w-8 h-8 text-[#61AFEF]" />,
               title: "Real-Time Messaging",
               description:
-                "Experience instant message delivery with typing indicators and read receipts.",
+                "Experience instant message delivery with typing indicators and read receipts for seamless communication.",
             },
             {
-              icon: "📱",
+              icon: (
+                <DevicePhoneMobileIcon className="w-8 h-8 text-[#61AFEF]" />
+              ),
               title: "Cross-Platform",
               description:
-                "Access your chats from any device, anywhere in the world.",
+                "Access your chats from any device, anywhere in the world with our seamless cross-platform support.",
             },
           ].map((feature, index) => (
             <motion.div
@@ -173,17 +140,21 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-[#21252B] rounded-xl p-6 border border-[#3E4451] hover:border-[#61AFEF]/50 transition-colors"
+              className="group bg-[#21252B] rounded-xl p-6 border border-[#3E4451] hover:border-[#61AFEF]/50 transition-all duration-200 hover:shadow-lg hover:shadow-[#61AFEF]/5"
             >
-              <div className="text-4xl mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-semibold mb-2 text-[#61AFEF]">
+              <div className="mb-4 p-3 bg-[#61AFEF]/10 rounded-lg w-fit group-hover:bg-[#61AFEF]/20 transition-colors">
+                {feature.icon}
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-white group-hover:text-[#61AFEF] transition-colors">
                 {feature.title}
               </h3>
-              <p className="text-[#ABB2BF]">{feature.description}</p>
+              <p className="text-[#ABB2BF] leading-relaxed">
+                {feature.description}
+              </p>
             </motion.div>
           ))}
         </div>
       </section>
-    </div>
+    </GridBackground>
   );
 }

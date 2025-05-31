@@ -9,12 +9,14 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#21252B]/80 backdrop-blur-md border-b border-[#3E4451]">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#252526]/95 backdrop-blur-md border-b border-[#3E4451] shadow-lg">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo and Brand */}
-          <Link to="/" className="flex items-center space-x-2">
-            <span className="text-2xl">💬</span>
+          <Link to="/" className="flex items-center space-x-2 group">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#61AFEF] to-[#4D8BCF] flex items-center justify-center shadow-lg group-hover:shadow-[#61AFEF]/20 transition-all duration-200">
+              <span className="text-white text-lg">💬</span>
+            </div>
             <span className="text-xl font-bold bg-gradient-to-r from-[#61AFEF] to-[#C678DD] bg-clip-text text-transparent">
               Whisprr
             </span>
@@ -24,25 +26,25 @@ export default function Navbar() {
           <div className="hidden md:flex items-center space-x-8">
             <Link
               to="/"
-              className="text-[#ABB2BF] hover:text-white transition-colors"
+              className="text-[#ABB2BF] hover:text-white transition-all duration-200 hover:scale-105"
             >
               Home
             </Link>
             <Link
               to="/features"
-              className="text-[#ABB2BF] hover:text-white transition-colors"
+              className="text-[#ABB2BF] hover:text-white transition-all duration-200 hover:scale-105"
             >
               Features
             </Link>
             <Link
               to="/about"
-              className="text-[#ABB2BF] hover:text-white transition-colors"
+              className="text-[#ABB2BF] hover:text-white transition-all duration-200 hover:scale-105"
             >
               About
             </Link>
             <Link
               to="/contact"
-              className="text-[#ABB2BF] hover:text-white transition-colors"
+              className="text-[#ABB2BF] hover:text-white transition-all duration-200 hover:scale-105"
             >
               Contact
             </Link>
@@ -55,7 +57,7 @@ export default function Navbar() {
                 <Link to="/dashboard">
                   <Button
                     variant="ghost"
-                    className="text-[#ABB2BF] hover:text-white hover:bg-[#2C313A]"
+                    className="text-[#ABB2BF] hover:text-white hover:bg-[#2C313A] transition-all duration-200"
                   >
                     Dashboard
                   </Button>
@@ -64,7 +66,8 @@ export default function Navbar() {
                   afterSignOutUrl="/"
                   appearance={{
                     elements: {
-                      avatarBox: "w-8 h-8",
+                      avatarBox:
+                        "w-8 h-8 shadow-lg hover:shadow-[#61AFEF]/20 transition-all duration-200",
                     },
                   }}
                 />
@@ -74,13 +77,13 @@ export default function Navbar() {
                 <SignInButton mode="modal">
                   <Button
                     variant="ghost"
-                    className="text-[#ABB2BF] hover:text-white hover:bg-[#2C313A] px-6"
+                    className="text-[#ABB2BF] hover:text-white hover:bg-[#2C313A] px-6 transition-all duration-200"
                   >
                     Sign In
                   </Button>
                 </SignInButton>
                 <SignUpButton mode="modal">
-                  <Button className="bg-gradient-to-r from-[#61AFEF] to-[#C678DD] hover:from-[#61AFEF]/90 hover:to-[#C678DD]/90 text-white px-6 shadow-lg shadow-[#61AFEF]/20">
+                  <Button className="bg-gradient-to-r from-[#61AFEF] to-[#4D8BCF] hover:from-[#4D8BCF] hover:to-[#61AFEF] text-white px-6 shadow-lg hover:shadow-[#61AFEF]/20 transition-all duration-200">
                     Sign Up
                   </Button>
                 </SignUpButton>
@@ -90,7 +93,7 @@ export default function Navbar() {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 text-[#ABB2BF] hover:text-white"
+            className="md:hidden p-2 text-[#ABB2BF] hover:text-white transition-all duration-200"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? (
@@ -127,32 +130,32 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-[#21252B] border-t border-[#3E4451]">
+          <div className="md:hidden bg-[#21252B] border-t border-[#3E4451] shadow-lg">
             <div className="px-4 py-4 space-y-4">
               <Link
                 to="/"
-                className="block text-[#ABB2BF] hover:text-white transition-colors py-2"
+                className="block text-[#ABB2BF] hover:text-white transition-all duration-200 py-2 hover:translate-x-1"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Home
               </Link>
               <Link
                 to="/features"
-                className="block text-[#ABB2BF] hover:text-white transition-colors py-2"
+                className="block text-[#ABB2BF] hover:text-white transition-all duration-200 py-2 hover:translate-x-1"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Features
               </Link>
               <Link
                 to="/about"
-                className="block text-[#ABB2BF] hover:text-white transition-colors py-2"
+                className="block text-[#ABB2BF] hover:text-white transition-all duration-200 py-2 hover:translate-x-1"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 About
               </Link>
               <Link
                 to="/contact"
-                className="block text-[#ABB2BF] hover:text-white transition-colors py-2"
+                className="block text-[#ABB2BF] hover:text-white transition-all duration-200 py-2 hover:translate-x-1"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Contact
@@ -161,7 +164,7 @@ export default function Navbar() {
                 <>
                   <Link
                     to="/dashboard"
-                    className="block text-[#ABB2BF] hover:text-white transition-colors py-2"
+                    className="block text-[#ABB2BF] hover:text-white transition-all duration-200 py-2 hover:translate-x-1"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Dashboard
@@ -172,7 +175,7 @@ export default function Navbar() {
                       afterSignOutUrl="/"
                       appearance={{
                         elements: {
-                          avatarBox: "w-8 h-8",
+                          avatarBox: "w-8 h-8 shadow-lg",
                         },
                       }}
                     />
@@ -183,7 +186,7 @@ export default function Navbar() {
                   <SignInButton mode="modal">
                     <Button
                       variant="ghost"
-                      className="w-full text-[#ABB2BF] hover:text-white hover:bg-[#2C313A] py-3"
+                      className="w-full text-[#ABB2BF] hover:text-white hover:bg-[#2C313A] py-3 transition-all duration-200"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       Sign In
@@ -191,7 +194,7 @@ export default function Navbar() {
                   </SignInButton>
                   <SignUpButton mode="modal">
                     <Button
-                      className="w-full bg-gradient-to-r from-[#61AFEF] to-[#C678DD] hover:from-[#61AFEF]/90 hover:to-[#C678DD]/90 text-white py-3 shadow-lg shadow-[#61AFEF]/20"
+                      className="w-full bg-gradient-to-r from-[#61AFEF] to-[#4D8BCF] hover:from-[#4D8BCF] hover:to-[#61AFEF] text-white py-3 shadow-lg hover:shadow-[#61AFEF]/20 transition-all duration-200"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       Sign Up
