@@ -9,4 +9,25 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    port: 5173,
+    proxy: {
+      "/socket.io": {
+        target: process.env.VITE_SERVER_URL || "http://localhost:3001",
+        ws: true,
+      },
+    },
+  },
+  build: {
+    outDir: "dist",
+    assetsDir: "assets",
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom", "socket.io-client"],
+        },
+      },
+    },
+  },
 });

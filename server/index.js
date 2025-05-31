@@ -2,8 +2,11 @@ const express = require("express");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
+const path = require("path");
 
 const app = express();
+
+// CORS configuration
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:5173",
@@ -11,6 +14,30 @@ app.use(
     credentials: true,
   })
 );
+
+// Set proper MIME types
+app.use((req, res, next) => {
+  if (req.url.endsWith(".js")) {
+    res.type("application/javascript");
+  }
+  next();
+});
+
+// Serve static files
+app.use(
+  express.static(path.join(__dirname, "../dist"), {
+    setHeaders: (res, path) => {
+      if (path.endsWith(".js")) {
+        res.setHeader("Content-Type", "application/javascript");
+      }
+    },
+  })
+);
+
+// Handle SPA routing
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../dist/index.html"));
+});
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
