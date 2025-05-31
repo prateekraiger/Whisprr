@@ -5,9 +5,34 @@ import {
   BoltIcon,
   DevicePhoneMobileIcon,
   ArrowRightIcon,
+  PaperAirplaneIcon,
+  LockClosedIcon,
 } from "@heroicons/react/24/outline";
 import GridBackground from "../components/ui/grid-background";
-import SkewHoverButton from "../components/ui/skew-hover-button";
+
+const ButtonGradient = ({ children, className = "" }) => {
+  return (
+    <button
+      className={`inline-flex h-12 items-center justify-center rounded-md border border-gray-800 bg-gradient-to-t from-[#8678f9] from-0% to-[#c7d2fe] px-6 font-medium text-gray-950 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-gray-50 hover:from-[#c7d2fe] hover:to-[#8678f9] ${className}`}
+    >
+      {children}
+    </button>
+  );
+};
+
+const MessageBubble = ({ message, isOwn = false }) => (
+  <div className={`flex ${isOwn ? "justify-end" : "justify-start"} mb-4`}>
+    <div
+      className={`max-w-[80%] rounded-2xl px-4 py-2 ${
+        isOwn
+          ? "bg-gradient-to-r from-[#8678f9] to-[#c7d2fe] text-gray-950"
+          : "bg-[#2C313A] text-[#ABB2BF]"
+      }`}
+    >
+      <p className="text-sm">{message}</p>
+    </div>
+  </div>
+);
 
 export default function Home() {
   return (
@@ -44,23 +69,27 @@ export default function Home() {
               encryption, real-time messaging, and seamless cross-platform
               support.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-6 mt-8">
               <Link to="/dashboard" className="w-full sm:w-auto">
-                <SkewHoverButton className="h-12 text-lg">
-                  Get Started
-                  <ArrowRightIcon className="w-5 h-5" />
-                </SkewHoverButton>
+                <ButtonGradient className="w-full sm:w-auto group">
+                  <span className="flex items-center gap-2">
+                    Get Started
+                    <ArrowRightIcon className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                  </span>
+                </ButtonGradient>
               </Link>
               <Link to="/features" className="w-full sm:w-auto">
-                <SkewHoverButton className="h-12 text-lg bg-[#2C313A] hover:bg-[#3E4451]">
-                  Learn More
-                  <ArrowRightIcon className="w-5 h-5" />
-                </SkewHoverButton>
+                <ButtonGradient className="w-full sm:w-auto bg-gradient-to-t from-[#2C313A] to-[#3E4451] text-white border-[#3E4451] hover:from-[#3E4451] hover:to-[#2C313A] group">
+                  <span className="flex items-center gap-2">
+                    Learn More
+                    <ArrowRightIcon className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                  </span>
+                </ButtonGradient>
               </Link>
             </div>
           </motion.div>
 
-          {/* Right column - Image or Animation */}
+          {/* Right column - Chat Preview */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -68,17 +97,66 @@ export default function Home() {
             className="relative"
           >
             <div className="aspect-square rounded-2xl bg-gradient-to-br from-[#61AFEF]/20 to-[#C678DD]/20 p-8">
-              <div className="w-full h-full rounded-xl bg-[#21252B]/80 backdrop-blur-sm border border-[#3E4451] shadow-lg flex items-center justify-center">
-                <div className="text-center space-y-4">
-                  <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-[#61AFEF] to-[#4D8BCF] flex items-center justify-center shadow-lg">
-                    <ShieldCheckIcon className="w-8 h-8 text-white" />
+              <div className="w-full h-full rounded-xl bg-[#21252B]/80 backdrop-blur-sm border border-[#3E4451] shadow-lg flex flex-col relative overflow-hidden group">
+                {/* Chat Header */}
+                <div className="p-4 border-b border-[#3E4451] flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#61AFEF] to-[#4D8BCF] flex items-center justify-center">
+                      <span className="text-white font-medium">JD</span>
+                    </div>
+                    <div>
+                      <h4 className="text-white font-medium">John Doe</h4>
+                      <p className="text-[#ABB2BF] text-sm">Online</p>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-semibold text-white">
-                    End-to-End Encrypted
-                  </h3>
-                  <p className="text-[#ABB2BF]">
-                    Your messages are secure and private
-                  </p>
+                  <div className="flex items-center gap-2 text-[#61AFEF]">
+                    <LockClosedIcon className="w-5 h-5" />
+                    <span className="text-sm">End-to-End Encrypted</span>
+                  </div>
+                </div>
+
+                {/* Chat Messages */}
+                <div className="flex-1 p-4 overflow-y-auto">
+                  <MessageBubble message="Hey! How's the project going?" />
+                  <MessageBubble
+                    message="It's going great! Just finished implementing the encryption layer."
+                    isOwn
+                  />
+                  <MessageBubble message="That's awesome! Can you tell me more about the security features?" />
+                  <MessageBubble
+                    message="Sure! We're using state-of-the-art end-to-end encryption. Your messages are encrypted on your device and can only be read by the intended recipient."
+                    isOwn
+                  />
+                </div>
+
+                {/* Chat Input */}
+                <div className="p-4 border-t border-[#3E4451]">
+                  <div className="flex items-center gap-2 bg-[#2C313A] rounded-full px-4 py-2">
+                    <input
+                      type="text"
+                      placeholder="Type a message..."
+                      className="flex-1 bg-transparent border-none outline-none text-[#ABB2BF] placeholder-[#ABB2BF]/50"
+                    />
+                    <button className="p-2 rounded-full bg-gradient-to-r from-[#8678f9] to-[#c7d2fe] text-gray-950">
+                      <PaperAirplaneIcon className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Encryption Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[#61AFEF]/10 to-[#C678DD]/10 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <div className="text-center space-y-4">
+                    <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-[#61AFEF] to-[#4D8BCF] flex items-center justify-center shadow-lg">
+                      <LockClosedIcon className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white">
+                      End-to-End Encrypted
+                    </h3>
+                    <p className="text-[#ABB2BF] max-w-xs">
+                      Your messages are protected with state-of-the-art
+                      encryption
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
