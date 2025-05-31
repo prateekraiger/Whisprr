@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "build": "echo 'No build step required for Node.js server'",
+    "prod": "NODE_ENV=production node index.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
