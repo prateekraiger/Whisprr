@@ -28,7 +28,12 @@ const Dashboard = () => {
   const [showCodePopup, setShowCodePopup] = useState(false);
 
   const handleCreateChat = () => {
-    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+    // Generate a 6-character alphanumeric code
+    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let code = "";
+    for (let i = 0; i < 6; i++) {
+      code += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
     setChatCode(code);
     setShowCodePopup(true);
   };

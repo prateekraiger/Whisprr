@@ -89,6 +89,16 @@ io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
   socket.on("join_chat", ({ chatCode, isHost }) => {
+    // Validate chat code
+    if (
+      !chatCode ||
+      typeof chatCode !== "string" ||
+      !/^[A-Z0-9]{6}$/.test(chatCode)
+    ) {
+      socket.emit("error", { message: "Invalid chat code" });
+      return;
+    }
+
     // Join the socket to the chat room
     socket.join(chatCode);
 
@@ -118,6 +128,16 @@ io.on("connection", (socket) => {
   });
 
   socket.on("send_message", ({ chatCode, message }) => {
+    // Validate chat code
+    if (
+      !chatCode ||
+      typeof chatCode !== "string" ||
+      !/^[A-Z0-9]{6}$/.test(chatCode)
+    ) {
+      socket.emit("error", { message: "Invalid chat code" });
+      return;
+    }
+
     const chat = activeChats.get(chatCode);
     if (chat) {
       chat.messages.push(message);

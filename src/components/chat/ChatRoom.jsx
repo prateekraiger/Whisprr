@@ -1,80 +1,91 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { io } from "socket.io-client";
+import { motion } from "framer-motion";
+import { FaPaperPlane, FaUser, FaCrown } from "react-icons/fa";
+import { useAuth } from "../../context/AuthContext";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { io } from "socket.io-client";
 
-// Create socket connection using environment variable
-const createSocket = () => {
-  const serverUrl = "https://whisprr-bcna.onrender.com";
-  console.log("Connecting to server:", serverUrl);
+const SERVER_URL = "https://whisprr-bcna.onrender.com";
 
-  return io(serverUrl, {
-    transports: ["websocket", "polling"],
-    reconnectionAttempts: 5,
-    reconnectionDelay: 1000,
-    path: "/socket.io",
-    withCredentials: true,
-    forceNew: true,
-    autoConnect: true,
-    timeout: 10000,
-    extraHeaders: {
-      "Access-Control-Allow-Origin": "*",
-    },
-  });
-};
-
-const socket = createSocket();
-
-export default function ChatRoom({ chatCode, isHost, onLeave }) {
+const ChatRoom = () => {
+  const { chatCode } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const [isConnected, setIsConnected] = useState(false);
+  const [participants, setParticipants] = useState([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const [typingUsers, setTypingUsers] = useState({});
   const [error, setError] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const messagesEndRef = useRef(null);
+  const socketRef = useRef(null);
 
   useEffect(() => {
-    // Handle connection status
-    socket.on("connect", () => {
+    // Initialize socket connection
+    socketRef.current = io(SERVER_URL, {
+      withCredentials: true,
+      forceNew: true,
+      path: "/socket.io",
+      transports: ["websocket", "polling"],
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
+
+    // Connection event handlers
+    socketRef.current.on("connect", () => {
       console.log("Connected to server");
       setIsConnected(true);
       setError(null);
     });
 
-    socket.on("connect_error", (err) => {
+    socketRef.current.on("connect_error", (err) => {
       console.error("Connection error:", err);
       setError("Failed to connect to server. Please try again later.");
       setIsConnected(false);
     });
 
-    socket.on("disconnect", () => {
+    socketRef.current.on("disconnect", () => {
       console.log("Disconnected from server");
       setIsConnected(false);
     });
 
-    // Join the chat room when component mounts
-    if (isConnected) {
-      socket.emit("join_chat", { chatCode, isHost });
-    }
+    // Join chat room
+    socketRef.current.emit("join_chat", {
+      chatCode,
+      isHost: user?.isHost || false,
+    });
 
-    // Listen for incoming messages
-    socket.on("receive_message", (message) => {
+    // Message handlers
+    socketRef.current.on("load_messages", (loadedMessages) => {
+      setMessages(loadedMessages);
+    });
+
+    socketRef.current.on("receive_message", (message) => {
       setMessages((prev) => [...prev, message]);
     });
 
-    // Load existing messages
-    socket.on("load_messages", (existingMessages) => {
-      setMessages(existingMessages);
+    socketRef.current.on("participants_update", (updatedParticipants) => {
+      setParticipants(updatedParticipants);
+    });
+
+    socketRef.current.on("typing", ({ userId, isTyping }) => {
+      setTypingUsers((prev) => ({
+        ...prev,
+        [userId]: isTyping,
+      }));
     });
 
     // Cleanup on unmount
     return () => {
-      socket.off("connect");
-      socket.off("connect_error");
-      socket.off("disconnect");
-      socket.off("receive_message");
-      socket.off("load_messages");
-      socket.disconnect();
+      if (socketRef.current) {
+        socketRef.current.emit("leave_chat", { chatCode });
+        socketRef.current.disconnect();
+      }
     };
-  }, [chatCode, isHost, isConnected]);
+  }, [chatCode, user]);
 
   const sendMessage = (e) => {
     e.preventDefault();
@@ -87,7 +98,7 @@ export default function ChatRoom({ chatCode, isHost, onLeave }) {
       };
 
       // Send message to server
-      socket.emit("send_message", { chatCode, message });
+      socketRef.current.emit("send_message", { chatCode, message });
       setNewMessage("");
     }
   };
@@ -102,7 +113,7 @@ export default function ChatRoom({ chatCode, isHost, onLeave }) {
           </div>
           <div>
             <h2 className="text-white font-semibold">
-              {isHost ? "Hosting Chat" : "Joined Chat"}
+              {user?.isHost ? "Hosting Chat" : "Joined Chat"}
             </h2>
             <p className="text-[#ABB2BF] text-sm">Code: {chatCode}</p>
           </div>
@@ -116,7 +127,7 @@ export default function ChatRoom({ chatCode, isHost, onLeave }) {
           <Button
             variant="ghost"
             className="text-[#ABB2BF] hover:text-white hover:bg-[#2C313A]"
-            onClick={onLeave}
+            onClick={() => navigate("/")}
           >
             Leave Chat
           </Button>
@@ -194,4 +205,6 @@ export default function ChatRoom({ chatCode, isHost, onLeave }) {
       </div>
     </div>
   );
-}
+};
+
+export default ChatRoom;
