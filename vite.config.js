@@ -13,6 +13,11 @@ export default defineConfig({
       "@": resolve(__dirname, "./src"),
     },
   },
+  define: {
+    "process.env.VITE_SERVER_URL": JSON.stringify(
+      "https://whisprr-bcna.onrender.com"
+    ),
+  },
   server: {
     port: 5173,
     proxy: {
@@ -41,5 +46,5 @@ export default defineConfig({
       polyfill: true,
     },
   },
-  base: "/",
+  base: "./",
 });
