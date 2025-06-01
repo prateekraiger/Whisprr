@@ -3,22 +3,17 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { io } from "socket.io-client";
 
-// Create socket connection with dynamic port
+// Create socket connection using environment variable
 const createSocket = () => {
-  // Try to connect to different ports if the default one fails
-  const ports = [3001, 3002, 3003, 3004, 3005];
-
-  for (const port of ports) {
-    try {
-      const socket = io(`http://localhost:${port}`);
-      return socket;
-    } catch (error) {
-      console.log(`Failed to connect to port ${port}, trying next...`);
-    }
-  }
-
-  // If all ports fail, use the default
-  return io("http://localhost:3001");
+  const serverUrl =
+    import.meta.env.VITE_SERVER_URL ||
+    window.env?.VITE_SERVER_URL ||
+    "http://localhost:3001";
+  return io(serverUrl, {
+    transports: ["websocket", "polling"],
+    reconnectionAttempts: 5,
+    reconnectionDelay: 1000,
+  });
 };
 
 const socket = createSocket();
@@ -95,7 +90,9 @@ export default function ChatRoom({ chatCode, isHost, onLeave }) {
         </div>
         <div className="flex items-center space-x-4">
           <div
-            className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : "bg-red-500"}`}
+            className={`w-2 h-2 rounded-full ${
+              isConnected ? "bg-green-500" : "bg-red-500"
+            }`}
           />
           <Button
             variant="ghost"
