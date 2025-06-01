@@ -5,14 +5,16 @@ import { io } from "socket.io-client";
 
 // Create socket connection using environment variable
 const createSocket = () => {
-  const serverUrl =
-    import.meta.env.VITE_SERVER_URL ||
-    window.env?.VITE_SERVER_URL ||
-    "http://localhost:3001";
+  const serverUrl = "https://whisprr-bcna.onrender.com";
+  console.log("Connecting to server:", serverUrl);
+
   return io(serverUrl, {
     transports: ["websocket", "polling"],
     reconnectionAttempts: 5,
     reconnectionDelay: 1000,
+    path: "/socket.io",
+    withCredentials: true,
+    forceNew: true,
   });
 };
 
@@ -22,12 +24,20 @@ export default function ChatRoom({ chatCode, isHost, onLeave }) {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [isConnected, setIsConnected] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     // Handle connection status
     socket.on("connect", () => {
       console.log("Connected to server");
       setIsConnected(true);
+      setError(null);
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("Connection error:", err);
+      setError("Failed to connect to server. Please try again later.");
+      setIsConnected(false);
     });
 
     socket.on("disconnect", () => {
@@ -36,7 +46,9 @@ export default function ChatRoom({ chatCode, isHost, onLeave }) {
     });
 
     // Join the chat room when component mounts
-    socket.emit("join_chat", { chatCode, isHost });
+    if (isConnected) {
+      socket.emit("join_chat", { chatCode, isHost });
+    }
 
     // Listen for incoming messages
     socket.on("receive_message", (message) => {
@@ -51,11 +63,12 @@ export default function ChatRoom({ chatCode, isHost, onLeave }) {
     // Cleanup on unmount
     return () => {
       socket.off("connect");
+      socket.off("connect_error");
       socket.off("disconnect");
       socket.off("receive_message");
       socket.off("load_messages");
     };
-  }, [chatCode, isHost]);
+  }, [chatCode, isHost, isConnected]);
 
   const sendMessage = (e) => {
     e.preventDefault();

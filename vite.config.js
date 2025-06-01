@@ -22,8 +22,10 @@ export default defineConfig({
     port: 5173,
     proxy: {
       "/socket.io": {
-        target: process.env.VITE_SERVER_URL || "http://localhost:3001",
+        target: "https://whisprr-bcna.onrender.com",
         ws: true,
+        changeOrigin: true,
+        secure: true,
       },
     },
   },
