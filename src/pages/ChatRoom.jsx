@@ -16,11 +16,13 @@ import {
 import { io } from "socket.io-client";
 import MessageBox from "../components/ui/message-box";
 
-const socket = io("http://localhost:3001", {
+const socket = io("https://whisprr-bcna.onrender.com", {
   reconnection: true,
   reconnectionAttempts: 5,
   reconnectionDelay: 1000,
   timeout: 10000,
+  withCredentials: true,
+  transports: ["websocket", "polling"],
 });
 
 const ChatRoom = () => {
