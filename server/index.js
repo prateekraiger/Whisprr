@@ -2,47 +2,65 @@ const express = require("express");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
-const path = require("path");
 
 const app = express();
+
+// Allowed origins including IP addresses
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://firebrick-turtle-743776.hostingersite.com",
+  "http://100.20.92.101",
+  "http://44.225.181.72",
+  "http://44.227.217.144",
+];
 
 // CORS configuration
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg =
+          "The CORS policy for this site does not allow access from the specified Origin.";
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
     methods: ["GET", "POST"],
     credentials: true,
   })
 );
 
-// Set proper MIME types
+// IP whitelist middleware
+const whitelistedIPs = ["100.20.92.101", "44.225.181.72", "44.227.217.144"];
+
 app.use((req, res, next) => {
-  if (req.url.endsWith(".js")) {
-    res.type("application/javascript");
+  const clientIP = req.ip || req.connection.remoteAddress;
+  if (whitelistedIPs.includes(clientIP)) {
+    next();
+  } else {
+    console.log("Blocked request from IP:", clientIP);
+    res.status(403).send("Access denied");
   }
-  next();
 });
 
-// Serve static files
-app.use(
-  express.static(path.join(__dirname, "../dist"), {
-    setHeaders: (res, path) => {
-      if (path.endsWith(".js")) {
-        res.setHeader("Content-Type", "application/javascript");
-      }
-    },
-  })
-);
-
-// Handle SPA routing
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../dist/index.html"));
+// Basic health check endpoint
+app.get("/", (req, res) => {
+  res.json({ status: "ok", message: "Server is running" });
 });
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST"],
     credentials: true,
   },
