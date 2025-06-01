@@ -15,6 +15,11 @@ const createSocket = () => {
     path: "/socket.io",
     withCredentials: true,
     forceNew: true,
+    autoConnect: true,
+    timeout: 10000,
+    extraHeaders: {
+      "Access-Control-Allow-Origin": "*",
+    },
   });
 };
 
@@ -67,6 +72,7 @@ export default function ChatRoom({ chatCode, isHost, onLeave }) {
       socket.off("disconnect");
       socket.off("receive_message");
       socket.off("load_messages");
+      socket.disconnect();
     };
   }, [chatCode, isHost, isConnected]);
 
@@ -116,6 +122,13 @@ export default function ChatRoom({ chatCode, isHost, onLeave }) {
           </Button>
         </div>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-500">
+          {error}
+        </div>
+      )}
 
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#282C34]">
