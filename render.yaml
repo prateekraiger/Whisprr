@@ -9,5 +9,8 @@ services:
         value: production
       - key: PORT
         value: 3001
+      - key: CORS_ORIGIN
+        value: https://firebrick-turtle-743776.hostingersite.com
     healthCheckPath: /
     autoDeploy: true
+    plan: free

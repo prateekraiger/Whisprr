@@ -33,18 +33,34 @@ app.use(
   })
 );
 
-// IP whitelist middleware
-const whitelistedIPs = ["100.20.92.101", "44.225.181.72", "44.227.217.144"];
+// IP whitelist middleware - only apply in production
+if (process.env.NODE_ENV === "production") {
+  const whitelistedIPs = [
+    "100.20.92.101",
+    "44.225.181.72",
+    "44.227.217.144",
+    "::1", // Allow localhost IPv6
+    "127.0.0.1", // Allow localhost IPv4
+  ];
 
-app.use((req, res, next) => {
-  const clientIP = req.ip || req.connection.remoteAddress;
-  if (whitelistedIPs.includes(clientIP)) {
-    next();
-  } else {
-    console.log("Blocked request from IP:", clientIP);
-    res.status(403).send("Access denied");
-  }
-});
+  app.use((req, res, next) => {
+    const clientIP = req.ip || req.connection.remoteAddress;
+    console.log("Request from IP:", clientIP);
+
+    // Check if the IP is in the whitelist
+    if (whitelistedIPs.includes(clientIP)) {
+      next();
+    } else {
+      // Log the blocked request but allow it in development
+      console.log("Blocked request from IP:", clientIP);
+      if (process.env.NODE_ENV === "development") {
+        next();
+      } else {
+        res.status(403).send("Access denied");
+      }
+    }
+  });
+}
 
 // Basic health check endpoint
 app.get("/", (req, res) => {
